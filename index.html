@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تقييم الأداء الوظيفي | تحفيظ الشرقية</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap">
+<style>
+:root{--navy:#33335f;--sky:#7bc4e0;--bg:#f4f5fa;--line:#e4e4ee;--mut:#6b6b8a;--red:#c0392b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--navy);font-family:Tajawal,system-ui,sans-serif;line-height:1.7}
+header{background:#fff;border-bottom:4px solid var(--sky);padding:14px 24px;display:flex;gap:16px;align-items:center}
+.logo{font-weight:700;font-size:20px;line-height:1.2;color:var(--navy);border-inline-end:2px solid var(--line);padding-inline-end:16px}
+header h1{margin:0;font-size:22px}header p{margin:0;color:var(--mut);font-size:15px}
+main{max-width:760px;margin:32px auto;padding:0 16px}
+.card{background:#fff;border-radius:24px;padding:32px;box-shadow:0 2px 14px #33335f14}
+.steps{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px}
+.st{display:flex;flex-direction:column;align-items:center;font-size:13px;color:var(--mut);gap:4px}
+.st i{width:40px;height:40px;border-radius:50%;background:#e8e8ee;display:grid;place-items:center;font-style:normal;font-weight:700}
+.st.on{color:var(--navy);font-weight:700}.st.on i{background:var(--navy);color:#fff}
+.st.done i{background:var(--sky);color:var(--navy)}
+.bar{height:3px;width:60px;background:#e8e8ee;margin-bottom:20px}.bar.done{background:var(--sky)}
+h2{margin:0 0 20px;font-size:24px}
+label.f{display:block;font-weight:700;margin:18px 0 6px}label.f b{color:var(--red)}
+input[type=text],select,textarea{width:100%;font:inherit;padding:13px 16px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--navy)}
+input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{font:inherit;font-weight:700;padding:22px 10px;border:2px solid var(--line);border-radius:18px;background:#fff;color:var(--navy);cursor:pointer}
+.opt.sel{border-color:var(--navy);background:#e4f3fa}
+.chk{display:flex;gap:10px;align-items:center;margin-top:22px;font-weight:500}.chk input{width:20px;height:20px}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
+.btn{font:inherit;font-weight:700;padding:14px 30px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--navy);cursor:pointer}
+.btn.p{background:var(--navy);border-color:var(--navy);color:#fff}
+.err{color:var(--red);font-weight:700;margin-top:14px;min-height:24px}
+details{background:var(--bg);border:2px solid var(--line);border-radius:18px;margin-bottom:12px}
+summary{cursor:pointer;padding:16px 20px;font-weight:700;display:flex;justify-content:space-between;gap:10px;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary small{font-weight:500;color:var(--mut);white-space:nowrap}
+summary small.ok{color:#1d7a46;font-weight:700}
+.body{padding:0 20px 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{font:inherit;font-weight:700;min-width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:#fff;color:var(--navy);cursor:pointer}
+.chip.sel{background:var(--navy);border-color:var(--navy);color:#fff}
+.count{display:inline-block;background:var(--bg);border-radius:20px;padding:4px 16px;color:var(--mut);margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:9px 6px;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}
+.total{background:#e4f3fa;border-radius:16px;padding:16px 20px;font-weight:700;font-size:20px;margin:16px 0}
+@media(max-width:560px){.card{padding:20px}.opts{grid-template-columns:1fr}.bar{width:24px}}
+@media print{header,.steps,.nav,.noprint{display:none}body{background:#fff}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<header><div class="logo">تحفيظ<br>الشرقية</div><div><h1>تقييم الأداء الوظيفي</h1><p>المدارس والبرامج القرآنية · الحلقات النسائية · المجال الافتراضي</p></div></header>
+<main><div class="card"><div class="steps" id="steps"></div><div id="view"></div></div></main>
+<script>
+const APP_URL="ضعي-رابط-Apps-Script-هنا";
+const CATS=["معلمة","إدارية","حاضنة","حارسة"];
+// [البند, معلمة, إدارية, حاضنة, حارسة] — 0 = لا ينطبق
+const C=[
+["تحقيق الأهداف العليا للجمعية",4,5,5,5],["الاهتمام بالنمو القرآني والمعرفي",7,7,7,7],
+["التمكن من المادة العلمية والقدرة على تحقيقها",7,0,0,0],["الإلمام بالأسس التربوية في تطبيق الدروس",7,0,0,0],
+["الاهتمام بالتقويم المستمر ومراعاة الفروق الفردية",6,0,0,0],["المهارة في عرض الدروس وإدارة الفصل",7,0,0,0],
+["سلامة اللغة كتابة ولفظًا",5,0,0,0],["توزيع المنهج وملاءمة ما نُفِّذ منه للزمن",5,0,0,0],
+["استخدام السبورة والمصحف والوسائل التعليمية",4,0,0,0],["مستوى تحصيل الطالبات العلمي",8,0,0,0],
+["الإلمام بنظم العمل وإجراءاته",0,6,6,6],["العناية بالبيئة التعليمية والعهد",0,6,6,6],
+["العناية بمستندات العمل والأدلة والملفات",0,6,0,0],["المهارة والدقة والأمانة",0,4,4,4],
+["القدرة على الحوار وعرض الرأي",0,6,0,0],["الحرص على مصلحة المدرسة وسرية العمل",0,6,6,6],
+["الحرص على المشاركة في المشاريع أو البرامج أو المبادرات",3,3,3,3],["المحافظة على أوقات الدوام",8,9,9,8],
+["السلوك والسمت العام (القدوة الحسنة)",5,6,6,6],["تقدير المسؤولية",4,6,4,6],["تقبل التوجيهات وتنفيذها",4,6,4,4],
+["حسن التصرف",4,6,4,6],["العلاقة مع الرؤساء",4,6,4,4],["العلاقة مع الزميلات",4,6,4,4],
+["العلاقة مع الدارسات وأولياء الأمور",4,0,0,0],["العلاقة مع المراجعات",0,6,6,7],
+["القيام بالواجبات (رعاية الأطفال وسلامتهم)",0,0,21,0],["المحافظة على الموقع (نظافة الحضانة وخلوها من المخاطر)",0,0,6,0],
+["القيام بالواجبات (البوابة، الأمن، الكهرباء والتكييف)",0,0,0,20]];
+const S={code:"",staff:null,step:0,ack:false,ev:"",emp:"",dom:"",unit:"",cat:-1,sc:{},nt:{},free:""};
+const $=id=>document.getElementById(id);
+const items=()=>C.filter(c=>c[S.cat+1]>0);
+function steps(){const n=["البيانات الأساسية","التقييم","المراجعة"];$("steps").innerHTML=n.map((t,i)=>(i?`<div class="bar ${S.step>=i?"done":""}"></div>`:"")+`<div class="st ${S.step==i?"on":""} ${S.step>i?"done":""}"><i>${S.step>i?"✓":i+1}</i>${t}</div>`).join("")}
+function go(n){S.step=n;scrollTo(0,0);draw()}
+function draw(){if(!S.staff){$("steps").innerHTML="";return login()}steps();[p1,p2,p3][S.step]()}
+function login(){
+ $("view").innerHTML=`<h2>الدخول</h2><label class="f" for="cd">رمز المديرة <b>*</b></label><input type="text" id="cd" autocomplete="off"><div class="err" id="err" role="alert"></div><div class="nav"><span></span><button class="btn p" id="nx">دخول</button></div>`;
+ const run=async()=>{const c=$("cd").value.trim();if(!c)return $("err").textContent="أدخلي الرمز";$("nx").disabled=true;$("err").textContent="جارٍ التحقق...";
+  try{const r=await(await fetch(APP_URL+"?code="+encodeURIComponent(c))).json();if(!r.length){$("err").textContent="الرمز غير صحيح";$("nx").disabled=false;return}S.code=c;S.staff=r;draw()}catch(e){$("err").textContent="تعذر الاتصال، حاولي مرة أخرى";$("nx").disabled=false}};
+ $("nx").onclick=run;$("cd").onkeydown=e=>e.key=="Enter"&&run()}
+function p1(){
+ const L=S.staff,u=a=>[...new Set(a)];
+ const doms=u(L.map(x=>x.dom));if(!S.dom&&doms.length==1)S.dom=doms[0];
+ const units=u(L.filter(x=>x.dom==S.dom).map(x=>x.unit));if(!S.unit&&units.length==1)S.unit=units[0];
+ const cats=u(L.filter(x=>x.unit==S.unit).map(x=>x.cat));
+ const emps=L.filter(x=>x.unit==S.unit&&x.cat==CATS[S.cat]).map(x=>x.name);
+ const sel=(id,arr,v,ph)=>`<select id="${id}"><option value="">${ph}</option>${arr.map(k=>`<option ${v==k?"selected":""}>${k}</option>`).join("")}</select>`;
+ $("view").innerHTML=`<h2>البيانات الأساسية</h2>
+ <label class="f" for="ev">اسم من قامت بتعبئة التقييم <b>*</b></label><input type="text" id="ev" value="${S.ev}">
+ <label class="f" for="dom">المجال <b>*</b></label>${sel("dom",doms,S.dom,"اختاري المجال")}
+ <label class="f" for="unit">المدرسة أو البرنامج أو الحلقة <b>*</b></label>${sel("unit",units,S.unit,"اختاري")}
+ <label class="f">الفئة <b>*</b></label><div class="opts">${CATS.map((c,i)=>cats.includes(c)?`<button type="button" class="opt ${S.cat==i?"sel":""}" data-c="${i}">${c}</button>`:"").join("")}</div>
+ <label class="f" for="emp">اسم الموظفة <b>*</b></label>${sel("emp",emps,S.emp,"اختاري الموظفة")}
+ <label class="chk"><input type="checkbox" id="ack" ${S.ack?"checked":""}> أدركت خصوصية الرابط وألتزم بذلك (خاص بالقياديات فقط)</label>
+ <div class="err" id="err" role="alert"></div><div class="nav"><span></span><button class="btn p" id="nx">التالي</button></div>`;
+ $("ev").oninput=e=>S.ev=e.target.value;$("ack").onchange=e=>S.ack=e.target.checked;$("emp").onchange=e=>S.emp=e.target.value;
+ $("dom").onchange=e=>{S.dom=e.target.value;S.unit="";S.cat=-1;S.emp="";p1()};
+ $("unit").onchange=e=>{S.unit=e.target.value;S.cat=-1;S.emp="";p1()};
+ document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{S.cat=+b.dataset.c;S.sc={};S.nt={};S.emp="";p1()});
+ $("nx").onclick=()=>{const m=!S.ack?"يلزم الإقرار بخصوصية الرابط":!S.ev.trim()?"أدخلي اسم من قامت بالتعبئة":!S.dom?"اختاري المجال":!S.unit?"اختاري المدرسة أو البرنامج أو الحلقة":S.cat<0?"اختاري الفئة":!S.emp?"اختاري الموظفة":"";m?$("err").textContent=m:go(1)}}
+function p2(){
+ const L=items();
+ $("view").innerHTML=`<h2>تقييم ${CATS[S.cat]==="معلمة"?"المعلمات":CATS[S.cat]==="إدارية"?"الإداريات":CATS[S.cat]==="حاضنة"?"الحاضنات":"الحارسات"}</h2><span class="count" id="cnt"></span>
+ ${L.map((c,i)=>{const m=c[S.cat+1];return `<details ${i==0?"open":""}><summary><span>${c[0]}</span><small id="b${i}">من ${m}</small></summary><div class="body">
+ <div class="chips">${Array.from({length:m},(_,k)=>`<button type="button" class="chip ${S.sc[i]==k+1?"sel":""}" data-i="${i}" data-v="${k+1}">${k+1}</button>`).join("")}</div>
+ <label class="f" for="n${i}">الملاحظات <b>*</b></label><textarea id="n${i}" rows="2" data-n="${i}">${S.nt[i]||""}</textarea></div></details>`}).join("")}
+ <label class="f" for="free">مساحة حرة وتفاصيل</label><textarea id="free" rows="3">${S.free}</textarea>
+ <div class="err" id="err" role="alert"></div><div class="nav"><button class="btn" id="bk">رجوع</button><button class="btn p" id="nx">مراجعة التقييم</button></div>`;
+ const upd=()=>{let d=0;L.forEach((c,i)=>{const ok=S.sc[i]&&(S.nt[i]||"").trim();if(ok)d++;const b=$("b"+i);b.className=ok?"ok":"";b.textContent=S.sc[i]?`${S.sc[i]} من ${c[S.cat+1]}`:`من ${c[S.cat+1]}`});$("cnt").textContent=`${d} من ${L.length} بنود مكتملة`};upd();
+ document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=b.dataset.i;S.sc[i]=+b.dataset.v;b.parentNode.querySelectorAll(".chip").forEach(x=>x.classList.toggle("sel",x==b));upd()});
+ document.querySelectorAll("[data-n]").forEach(t=>t.oninput=()=>{S.nt[t.dataset.n]=t.value;upd()});
+ $("free").oninput=e=>S.free=e.target.value;$("bk").onclick=()=>go(0);
+ $("nx").onclick=()=>{const i=L.findIndex((c,i)=>!S.sc[i]||!(S.nt[i]||"").trim());if(i>=0){$("err").textContent=`أكملي الدرجة والملاحظات في البند: ${L[i][0]}`;document.querySelectorAll("details")[i].open=true;document.querySelectorAll("details")[i].scrollIntoView({block:"center"})}else go(2)}}
+function p3(){
+ const L=items();let t=0,mx=0;L.forEach((c,i)=>{t+=S.sc[i]||0;mx+=c[S.cat+1]});
+ $("view").innerHTML=`<h2>المراجعة</h2><p>الموظفة: <b>${S.emp}</b> — ${CATS[S.cat]}<br>${S.unit}<br>المقيِّمة: ${S.ev}</p>
+ <div class="total">المجموع: ${t} من ${mx} (${Math.round(t/mx*100)}٪)</div>
+ <table><tr><th>البند</th><th>الدرجة</th><th>الملاحظات</th></tr>${L.map((c,i)=>`<tr><td>${c[0]}</td><td>${S.sc[i]}/${c[S.cat+1]}</td><td>${(S.nt[i]||"").replace(/</g,"&lt;")}</td></tr>`).join("")}</table>
+ ${S.free?`<p><b>مساحة حرة:</b> ${S.free.replace(/</g,"&lt;")}</p>`:""}
+ <div class="err noprint" id="msg"></div><div class="nav noprint"><button class="btn" id="bk">رجوع</button><button class="btn" onclick="print()">طباعة</button><button class="btn p" id="sd">إرسال التقييم</button></div>`;
+ $("bk").onclick=()=>go(1);
+ $("sd").onclick=async()=>{$("sd").disabled=true;$("msg").textContent="جارٍ الإرسال...";
+  try{const r=await(await fetch(APP_URL,{method:"POST",body:JSON.stringify({code:S.code,ev:S.ev,emp:S.emp,dom:S.dom,unit:S.unit,cat:CATS[S.cat],total:t,max:mx,items:JSON.stringify(L.map((c,i)=>({b:c[0],s:S.sc[i],m:c[S.cat+1],n:S.nt[i]}))),free:S.free})})).json();
+  if(!r.ok)throw 0;$("view").innerHTML='<h2>تم إرسال التقييم</h2><p>شكرًا لك، تم حفظ التقييم.</p><div class="nav"><span></span><button class="btn p" id="again">تقييم موظفة أخرى</button></div>';
+  $("again").onclick=()=>{Object.assign(S,{step:0,emp:"",cat:-1,sc:{},nt:{},free:""});draw()}}catch(e){$("msg").textContent="تعذر الإرسال، حاولي مرة أخرى";$("sd").disabled=false}}}
+draw();
+</script>
+</body>
+</html>
