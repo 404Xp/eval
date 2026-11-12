@@ -36,7 +36,7 @@ input:focus,select:focus,button:focus-visible{outline:3px solid var(--rose);outl
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
 firebase.initializeApp({apiKey:"AIzaSyDFFXzLJSwDv_iohknLec8ZiMy6xHkGtNc",authDomain:"staff-eval-3af95.firebaseapp.com",projectId:"staff-eval-3af95",storageBucket:"staff-eval-3af95.firebasestorage.app",messagingSenderId:"511870167807",appId:"1:511870167807:web:7c13e4c0efe5fc93be7aca"});
-const db=firebase.firestore(),auth=firebase.auth(),ADMIN="quran.dm@gmail.com";
+const db=firebase.firestore(),auth=firebase.auth(),ADMINS=["ranaaqeelorg@gmail.com","quran.dm@gmail.com"];
 const $=id=>document.getElementById(id);
 const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const nz=s=>(s||"").replace(/[\u064B-\u065F\u0640\s]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي");
@@ -46,9 +46,9 @@ const D={tab:"ctl",dom:"",late:false,q:"",open:null};
 const col=async c=>(await db.collection(c).get()).docs.map(d=>Object.assign({id:d.id},d.data()));
 auth.onAuthStateChanged(u=>{
  if(!u)return loginView();
- if(u.email!==ADMIN){$("view").innerHTML='<div class="card"><h2>غير مصرّح</h2><p>هذا الحساب لا يملك صلاحية الدخول للوحة الإدارة.</p><button class="btn p" id="so">تسجيل الخروج</button></div>';$("so").onclick=()=>auth.signOut();return}
+ if(ADMINS.indexOf(u.email)<0){$("view").innerHTML='<div class="card"><h2>غير مصرّح</h2><p>هذا الحساب لا يملك صلاحية الدخول للوحة الإدارة.</p><button class="btn p" id="so">تسجيل الخروج</button></div>';$("so").onclick=()=>auth.signOut();return}
  $("who").innerHTML=`<small>${esc(u.email)}</small> <button class="btn" id="out">خروج</button>`;$("out").onclick=()=>auth.signOut();load()});
-function loginView(){$("who").innerHTML="";$("view").innerHTML='<div class="card"><h2>تسجيل الدخول</h2><p>لوحة الإدارة خاصة بحساب الجمعية فقط.</p><button class="btn p" id="gi">تسجيل الدخول بحساب جوجل</button><p class="err" id="le"></p></div>';
+function loginView(){$("who").innerHTML="";$("view").innerHTML='<div class="card"><h2>تسجيل الدخول</h2><p>لوحة الإدارة خاصة بالحسابات المصرّح لها فقط.</p><button class="btn p" id="gi">تسجيل الدخول بحساب جوجل</button><p class="err" id="le"></p></div>';
  $("gi").onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>{$("le").textContent="تعذر تسجيل الدخول: "+(e.code||"")})}
 async function load(){$("view").innerHTML='<div class="card">جارٍ تحميل البيانات...</div>';
  try{const [s,l,h,units,st,ev]=await Promise.all([db.doc("settings/main").get(),db.doc("managers/list").get(),db.doc("managers/halaqat").get(),col("units"),col("mgrState"),col("evaluations")]);
