@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة الإدارة | تقييم الأداء الوظيفي</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap">
+<style>
+:root{--navy:#3b4666;--rose:#e2bdb6;--bg:#f9f1f0;--line:#e8dedb;--mut:#6e6b7a;--red:#b83a32;--ok:#1d7a46}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--navy);font-family:Tajawal,system-ui,sans-serif;line-height:1.7}
+header{background:#fff;border-bottom:4px solid var(--rose);padding:12px 24px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+header h1{margin:0;font-size:21px}header small{color:var(--mut)}
+main{max-width:1000px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border-radius:20px;padding:24px;box-shadow:0 2px 14px #3b466614;margin-bottom:16px}
+h2{margin:0 0 14px;font-size:21px}h3{margin:18px 0 8px;font-size:17px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.btn{font:inherit;font-weight:700;padding:10px 20px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--navy);cursor:pointer}
+.btn.p,.tab.on{background:var(--navy);border-color:var(--navy);color:#fff}.btn:disabled{opacity:.5}
+input[type=text],input[type=datetime-local],select{font:inherit;padding:10px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--navy)}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--rose);outline-offset:2px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:10px 0}.row label{font-weight:700}
+.sw{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);font-weight:700}.sw input{width:22px;height:22px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:12px 0}
+.k{background:var(--bg);border-radius:16px;padding:14px;text-align:center}.k b{display:block;font-size:26px}.k span{color:var(--mut);font-size:14px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:9px 8px;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}th{background:var(--bg)}
+.bar{height:10px;border-radius:6px;background:#ececec;min-width:90px;overflow:hidden}.bar i{display:block;height:100%;background:var(--navy)}
+.msg{min-height:24px;font-weight:700;color:var(--ok)}.err{color:var(--red)}
+.mut{color:var(--mut)}a.lnk{color:var(--navy);font-weight:700;cursor:pointer;text-decoration:underline}
+</style>
+</head>
+<body>
+<header><div><h1>لوحة الإدارة</h1><small>تقييم الأداء الوظيفي</small></div><div id="who"></div></header>
+<main id="view"></main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyDFFXzLJSwDv_iohknLec8ZiMy6xHkGtNc",authDomain:"staff-eval-3af95.firebaseapp.com",projectId:"staff-eval-3af95",storageBucket:"staff-eval-3af95.firebasestorage.app",messagingSenderId:"511870167807",appId:"1:511870167807:web:7c13e4c0efe5fc93be7aca"});
+const db=firebase.firestore(),auth=firebase.auth(),ADMIN="quran.dm@gmail.com";
+const $=id=>document.getElementById(id);
+const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const nz=s=>(s||"").replace(/[\u064B-\u065F\u0640\s]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي");
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+const ar=(a,b)=>a.localeCompare(b,"ar");
+const D={tab:"ctl",dom:"",late:false,q:"",open:null};
+const col=async c=>(await db.collection(c).get()).docs.map(d=>Object.assign({id:d.id},d.data()));
+auth.onAuthStateChanged(u=>{
+ if(!u)return loginView();
+ if(u.email!==ADMIN){$("view").innerHTML='<div class="card"><h2>غير مصرّح</h2><p>هذا الحساب لا يملك صلاحية الدخول للوحة الإدارة.</p><button class="btn p" id="so">تسجيل الخروج</button></div>';$("so").onclick=()=>auth.signOut();return}
+ $("who").innerHTML=`<small>${esc(u.email)}</small> <button class="btn" id="out">خروج</button>`;$("out").onclick=()=>auth.signOut();load()});
+function loginView(){$("who").innerHTML="";$("view").innerHTML='<div class="card"><h2>تسجيل الدخول</h2><p>لوحة الإدارة خاصة بحساب الجمعية فقط.</p><button class="btn p" id="gi">تسجيل الدخول بحساب جوجل</button><p class="err" id="le"></p></div>';
+ $("gi").onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>{$("le").textContent="تعذر تسجيل الدخول: "+(e.code||"")})}
+async function load(){$("view").innerHTML='<div class="card">جارٍ تحميل البيانات...</div>';
+ try{const [s,l,h,units,st,ev]=await Promise.all([db.doc("settings/main").get(),db.doc("managers/list").get(),db.doc("managers/halaqat").get(),col("units"),col("mgrState"),col("evaluations")]);
+  D.set=s.data()||{};D.units={};units.forEach(u=>D.units[u.id]=u);D.st={};st.forEach(x=>D.st[x.id]=x.emps||{});
+  D.leaders=((l.data()||{}).items||[]).map(x=>({n:x.n,k:x.k,u:x.u||[]}));
+  const hu=((h.data()||{}).items||[]).flatMap(x=>x.u||[]);if(hu.length)D.leaders.push({n:"مسؤولة الحلقات",k:"H",u:hu});
+  D.ev=ev;draw()}
+ catch(e){$("view").innerHTML='<div class="card"><p class="err">تعذر تحميل البيانات.</p><button class="btn p" onclick="load()">إعادة المحاولة</button></div>'}}
+function draw(){const T=[["ctl","الإعدادات"],["prg","التقدم"],["srch","البحث"],["stat","الإحصائيات"]];
+ $("view").innerHTML=`<div class="tabs">${T.map(t=>`<button class="btn tab ${D.tab==t[0]?"on":""}" data-t="${t[0]}">${t[1]}</button>`).join("")}<button class="btn" id="rl">تحديث البيانات</button></div><div id="pane"></div>`;
+ document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{D.tab=b.dataset.t;draw()});$("rl").onclick=load;
+ ({ctl,prg,srch,stat})[D.tab]()}
+const loc=d=>new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,16);
+function ctl(){const s=D.set,eu=s.editUntil&&s.editUntil.toDate?s.editUntil.toDate():null,live=eu&&eu>new Date();
+ $("pane").innerHTML=`<div class="card"><h2>التحكم</h2>
+ <label class="sw"><input type="checkbox" id="c_open" ${s.open!==false?"checked":""}> فتح التقييم (إرسال التقييمات وحفظ المسودات)</label>
+ <label class="sw"><input type="checkbox" id="c_link" ${s.linkOpen!==false?"checked":""}> فتح الرابط للقيادات</label>
+ <h3>مدة التعديل</h3><p class="mut">${live?"التعديل مفتوح حتى "+eu.toLocaleString("ar-SA"):"التعديل مغلق حالياً"}</p>
+ <div class="row"><label for="c_eu">ينتهي التعديل في:</label><input type="datetime-local" id="c_eu" value="${eu?loc(eu):""}"><button class="btn p" id="c_sv">حفظ التاريخ</button><button class="btn" id="c_cl">إغلاق التعديل الآن</button></div>
+ <p class="msg" id="m"></p></div>`;
+ const save=async(o,t)=>{try{await db.doc("settings/main").set(o,{merge:true});Object.assign(D.set,o);$("m").className="msg";$("m").textContent=t}catch(e){$("m").className="msg err";$("m").textContent="تعذر الحفظ"}};
+ $("c_open").onchange=e=>save({open:e.target.checked},e.target.checked?"تم فتح التقييم":"تم إغلاق التقييم");
+ $("c_link").onchange=e=>save({linkOpen:e.target.checked},e.target.checked?"تم فتح الرابط":"تم إغلاق الرابط");
+ $("c_sv").onclick=async()=>{const v=$("c_eu").value;if(!v)return;await save({editUntil:firebase.firestore.Timestamp.fromDate(new Date(v))},"تم حفظ تاريخ التعديل");ctl()};
+ $("c_cl").onclick=async()=>{try{await db.doc("settings/main").update({editUntil:firebase.firestore.FieldValue.delete()});delete D.set.editUntil;ctl()}catch(e){$("m").className="msg err";$("m").textContent="تعذر الإغلاق"}}}
+function rowFor(L,dom){const us=L.u.map(i=>D.units[i]).filter(u=>u&&(!dom||u.dom==dom)),S=new Map();
+ us.forEach(u=>(u.staff||[]).forEach(s=>S.set(s.id,s)));const E=D.st[L.k]||{};let done=0,draft=0;
+ S.forEach((s,id)=>{const e=E[id];if(e&&e.s=="done")done++;else if(e&&e.s=="draft")draft++});
+ return{n:L.n,units:us.map(u=>u.unit),total:S.size,done,draft,none:S.size-done-draft}}
+function prg(){const doms=[...new Set(Object.values(D.units).map(u=>u.dom))].sort(ar);
+ let R=D.leaders.map(L=>rowFor(L,D.dom)).filter(r=>r.total>0);const T=R.reduce((a,r)=>({t:a.t+r.total,d:a.d+r.done,r:a.r+r.draft,n:a.n+r.none}),{t:0,d:0,r:0,n:0});
+ if(D.late)R=R.filter(r=>r.done<r.total);R.sort((a,b)=>pct(a.done,a.total)-pct(b.done,b.total)||ar(a.n,b.n));
+ $("pane").innerHTML=`<div class="card"><h2>التقدم</h2>
+ <div class="row"><label for="f_d">المجال:</label><select id="f_d"><option value="">الكل</option>${doms.map(d=>`<option ${D.dom==d?"selected":""}>${esc(d)}</option>`).join("")}</select>
+ <label><input type="checkbox" id="f_l" ${D.late?"checked":""}> المتأخرات فقط</label><button class="btn" id="cp">نسخ أسماء المتأخرات</button></div>
+ <div class="cards"><div class="k"><b>${T.t}</b><span>مطلوب تقييمه</span></div><div class="k"><b>${T.d}</b><span>تم</span></div><div class="k"><b>${T.r}</b><span>مسودات</span></div><div class="k"><b>${T.n}</b><span>لم يبدأ</span></div><div class="k"><b>${pct(T.d,T.t)}٪</b><span>نسبة الإنجاز</span></div></div>
+ <p class="mut">الموظفة عند قياديتين تُحسب مرتين (تقييم لكل قيادية).</p>
+ <div class="tw"><table><tr><th>القيادية</th><th>المواقع</th><th>المطلوب</th><th>تم</th><th>مسودة</th><th>لم يبدأ</th><th>الإنجاز</th></tr>
+ ${R.map(r=>`<tr><td>${esc(r.n)}</td><td>${esc(r.units.join("، "))}</td><td>${r.total}</td><td>${r.done}</td><td>${r.draft}</td><td>${r.none}</td><td><div class="bar"><i style="width:${pct(r.done,r.total)}%"></i></div>${pct(r.done,r.total)}٪</td></tr>`).join("")}</table></div></div>`;
+ $("f_d").onchange=e=>{D.dom=e.target.value;prg()};$("f_l").onchange=e=>{D.late=e.target.checked;prg()};
+ $("cp").onclick=()=>{const late=D.leaders.map(L=>rowFor(L,D.dom)).filter(r=>r.total>0&&r.done<r.total).map(r=>r.n+" ("+r.done+"/"+r.total+")").join("\n");try{navigator.clipboard.writeText(late);$("cp").textContent="تم النسخ"}catch(e){}}}
+function srch(){$("pane").innerHTML=`<div class="card"><h2>البحث عن موظفة</h2><div class="row"><input type="text" id="q" placeholder="اكتبي جزءاً من الاسم" value="${esc(D.q)}" style="flex:1;min-width:220px"></div><div id="res"></div></div>`;
+ const go=()=>{D.q=$("q").value;const k=nz(D.q);if(k.length<2){$("res").innerHTML='<p class="mut">اكتبي حرفين على الأقل.</p>';return}
+  const R=D.ev.filter(e=>nz(e.emp).includes(k)).sort((a,b)=>ar(a.emp,b.emp));
+  $("res").innerHTML=R.length?`<div class="tw"><table><tr><th>الموظفة</th><th>الفئة</th><th>الموقع</th><th>المقيِّمة</th><th>الدرجة</th><th></th></tr>${R.map((e,i)=>`<tr><td>${esc(e.emp)}</td><td>${esc(e.cat)}</td><td>${esc(e.unit)}</td><td>${esc(e.ev)}</td><td>${e.total}/${e.max} (${pct(e.total,e.max)}٪)</td><td><a class="lnk" data-i="${i}">التفاصيل</a></td></tr>`).join("")}</table></div>`:'<p class="mut">لا توجد نتائج.</p>';
+  document.querySelectorAll("[data-i]").forEach(a=>a.onclick=()=>detail(R[a.dataset.i]))};
+ $("q").oninput=go;if(D.q)go()}
+function detail(e){let L=[];try{L=JSON.parse(e.items||"[]")}catch(x){}
+ $("res").innerHTML=`<p><a class="lnk" id="bk">رجوع للنتائج</a></p><h3>${esc(e.emp)} — ${esc(e.cat)}</h3><p>${esc(e.unit)}<br>المقيِّمة: ${esc(e.ev)}<br>المجموع: ${e.total} من ${e.max} (${pct(e.total,e.max)}٪)</p>
+ <div class="tw"><table><tr><th>البند</th><th>الدرجة</th><th>الملاحظات</th></tr>${L.map(r=>`<tr><td>${esc(r.b)}</td><td>${r.s}/${r.m}</td><td>${esc(r.n)}</td></tr>`).join("")}</table></div>${e.free?`<p><b>مساحة حرة:</b> ${esc(e.free)}</p>`:""}`;
+ $("bk").onclick=()=>$("q").dispatchEvent(new Event("input"))}
+function stat(){const g=(f)=>{const m={};D.ev.forEach(e=>{const k=f(e)||"—",o=m[k]||(m[k]={n:0,t:0,x:0});o.n++;o.t+=e.total;o.x+=e.max});return Object.keys(m).sort(ar).map(k=>[k,m[k].n,pct(m[k].t,m[k].x)])};
+ const tb=(h,a)=>`<div class="tw"><table><tr><th>${h}</th><th>عدد التقييمات</th><th>متوسط الدرجة</th></tr>${a.map(r=>`<tr><td>${esc(r[0])}</td><td>${r[1]}</td><td>${r[2]}٪</td></tr>`).join("")}</table></div>`;
+ const all=D.ev.reduce((a,e)=>({t:a.t+e.total,x:a.x+e.max}),{t:0,x:0});
+ $("pane").innerHTML=`<div class="card"><h2>الإحصائيات</h2><div class="cards"><div class="k"><b>${D.ev.length}</b><span>تقييم مكتمل</span></div><div class="k"><b>${pct(all.t,all.x)}٪</b><span>المتوسط العام</span></div></div>
+ <h3>حسب المجال</h3>${tb("المجال",g(e=>e.dom))}<h3>حسب الفئة</h3>${tb("الفئة",g(e=>e.cat))}</div>`}
+</script>
+</body>
+</html>
