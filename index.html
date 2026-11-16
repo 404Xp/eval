@@ -6,27 +6,27 @@
 <title>تقييم الأداء الوظيفي | تحفيظ الشرقية</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap">
 <style>
-:root{--navy:#33335f;--sky:#7bc4e0;--bg:#f4f5fa;--line:#e4e4ee;--mut:#6b6b8a;--red:#c0392b}
+:root{--navy:#3b4666;--sky:#e2bdb6;--bg:#f9f1f0;--line:#e8dedb;--mut:#6e6b7a;--red:#b83a32}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--navy);font-family:Tajawal,system-ui,sans-serif;line-height:1.7}
 header{background:#fff;border-bottom:4px solid var(--sky);padding:14px 24px;display:flex;gap:16px;align-items:center}
 .logo{font-weight:700;font-size:20px;line-height:1.2;color:var(--navy);border-inline-end:2px solid var(--line);padding-inline-end:16px}
 header h1{margin:0;font-size:22px}header p{margin:0;color:var(--mut);font-size:15px}
 main{max-width:760px;margin:32px auto;padding:0 16px}
-.card{background:#fff;border-radius:24px;padding:32px;box-shadow:0 2px 14px #33335f14}
+.card{background:#fff;border-radius:24px;padding:32px;box-shadow:0 2px 14px #3b466614}
 .steps{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px}
 .st{display:flex;flex-direction:column;align-items:center;font-size:13px;color:var(--mut);gap:4px}
-.st i{width:40px;height:40px;border-radius:50%;background:#e8e8ee;display:grid;place-items:center;font-style:normal;font-weight:700}
+.st i{width:40px;height:40px;border-radius:50%;background:#ececec;display:grid;place-items:center;font-style:normal;font-weight:700}
 .st.on{color:var(--navy);font-weight:700}.st.on i{background:var(--navy);color:#fff}
 .st.done i{background:var(--sky);color:var(--navy)}
-.bar{height:3px;width:60px;background:#e8e8ee;margin-bottom:20px}.bar.done{background:var(--sky)}
+.bar{height:3px;width:60px;background:#ececec;margin-bottom:20px}.bar.done{background:var(--sky)}
 h2{margin:0 0 20px;font-size:24px}
 label.f{display:block;font-weight:700;margin:18px 0 6px}label.f b{color:var(--red)}
 input[type=text],select,textarea{width:100%;font:inherit;padding:13px 16px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--navy)}
 input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .opt{font:inherit;font-weight:700;padding:22px 10px;border:2px solid var(--line);border-radius:18px;background:#fff;color:var(--navy);cursor:pointer}
-.opt.sel{border-color:var(--navy);background:#e4f3fa}
+.opt.sel{border-color:var(--navy);background:#f6e4e0}
 .chk{display:flex;gap:10px;align-items:center;margin-top:22px;font-weight:500}.chk input{width:20px;height:20px}
 .nav{display:flex;justify-content:space-between;gap:12px;margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
 .btn{font:inherit;font-weight:700;padding:14px 30px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--navy);cursor:pointer}
@@ -44,8 +44,8 @@ summary small.ok{color:#1d7a46;font-weight:700}
 .chip.sel{background:var(--navy);border-color:var(--navy);color:#fff}
 .count{display:inline-block;background:var(--bg);border-radius:20px;padding:4px 16px;color:var(--mut);margin-bottom:16px}
 table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:9px 6px;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}
-.total{background:#e4f3fa;border-radius:16px;padding:16px 20px;font-weight:700;font-size:20px;margin:16px 0}
-.row{display:flex;align-items:center;gap:12px;background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:14px 18px;margin-bottom:10px}.row>div{flex:1}.tag{font-weight:700;font-size:14px;padding:4px 12px;border-radius:20px;background:#e8e8ee}.tag.done{background:#d9f2e3;color:#1d7a46}.tag.draft{background:#fff1cc;color:#8a5a00}.btn.sm{padding:8px 18px}.nav{flex-wrap:wrap}
+.total{background:#f6e4e0;border-radius:16px;padding:16px 20px;font-weight:700;font-size:20px;margin:16px 0}
+.row{display:flex;align-items:center;gap:12px;background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:14px 18px;margin-bottom:10px}.row>div{flex:1}.tag{font-weight:700;font-size:14px;padding:4px 12px;border-radius:20px;background:#ececec}.tag.done{background:#d9f2e3;color:#1d7a46}.tag.draft{background:#fff1cc;color:#8a5a00}.btn.sm{padding:8px 18px}.nav{flex-wrap:wrap}
 .mut{color:var(--mut);margin:0 0 12px}h3{margin:0 0 6px;font-size:18px}.card2{border:2px solid var(--line);border-radius:18px;padding:16px 20px;margin:16px 0}.card2 .nav{margin-top:12px;padding-top:0;border:0}
 button.row{width:100%;font:inherit;text-align:start;cursor:pointer;color:var(--navy)}
 .err.top{position:sticky;top:0;z-index:5;background:#fdecea;border-radius:12px;padding:10px 14px;margin:0 0 12px}.err.top:empty{display:none}
@@ -89,7 +89,7 @@ function login(){
  const dl=(id,a)=>`<datalist id="${id}">${a.map(x=>`<option value="${esc(x.n)}">`).join("")}</datalist>`;
  $("view").innerHTML=`<h2>الدخول</h2>
  <label class="chk"><input type="checkbox" id="ack"> أدركت خصوصية الرابط وألتزم بذلك (خاص بالقياديات فقط)</label>
- <div class="card2"><h3>القيادات ومشرفات الميدان</h3><label class="f" for="mg">اسم المديرة <b>*</b></label><input type="text" id="mg" list="ml" autocomplete="off" placeholder="اكتبي اسمك واختاريه من القائمة">${dl("ml",S.mgrs)}<div class="nav"><span></span><button class="btn p" id="nx">دخول</button></div></div>
+ <div class="card2"><h3>القيادات ومشرفات الميدان</h3><label class="f" for="mg">اسم القيادية <b>*</b></label><input type="text" id="mg" list="ml" autocomplete="off" placeholder="اكتبي اسمك واختاريه من القائمة">${dl("ml",S.mgrs)}<div class="nav"><span></span><button class="btn p" id="nx">دخول</button></div></div>
  <div class="card2"><h3>الحلقات</h3><label class="f" for="hl">اسم الحلقة <b>*</b></label><input type="text" id="hl" list="hlist" autocomplete="off" placeholder="اكتبي اسم الحلقة واختاريها من القائمة">${dl("hlist",S.hals)}<div class="nav"><span></span><button class="btn p" id="nh">دخول</button></div></div>
  <div class="err" id="err" role="alert"></div>`;
  const enter=async(mode,list,inp)=>{const n=$(inp).value.trim(),it=list.find(x=>x.n==n);
@@ -103,13 +103,13 @@ function login(){
 function dash(){
  const out=()=>{if(S.cur&&S.U.length>1){S.cur=null}else{Object.assign(S,{U:null,cur:null,m:"",k:"",emps:{}})}draw()};
  if(!S.cur){
-  $("view").innerHTML=`<h2>${esc(EV())}</h2><p class="mut">اختاري الموقع</p>${S.U.map((x,i)=>{const t=uq(x.staff),d=t.filter(y=>(S.emps[y.id]||{}).s=="done").length;return `<button type="button" class="row" data-l="${i}"><div><b>${esc(x.unit)}</b><br><small>${esc(x.dom)}</small></div><span class="tag">${d} من ${t.length}</span></button>`}).join("")}<div class="nav"><button class="btn" id="out">تغيير المديرة</button><span></span></div>`;
+  $("view").innerHTML=`<h2>${esc(EV())}</h2><p class="mut">اختاري الموقع</p>${S.U.map((x,i)=>{const t=uq(x.staff),d=t.filter(y=>(S.emps[y.id]||{}).s=="done").length;return `<button type="button" class="row" data-l="${i}"><div><b>${esc(x.unit)}</b><br><small>${esc(x.dom)}</small></div><span class="tag">${d} من ${t.length}</span></button>`}).join("")}<div class="nav"><button class="btn" id="out">تغيير القيادية</button><span></span></div>`;
   document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{S.cur=S.U[b.dataset.l];draw()});$("out").onclick=out;return}
  const st=uq(S.cur.staff),done=st.filter(x=>(S.emps[x.id]||{}).s=="done").length,lab={done:"تم ✓",draft:"مسودة",new:"لم يبدأ"},op=isOpen(),ce=canEdit();
  $("view").innerHTML=`<h2>${esc(EV())}</h2><p class="mut">${esc(S.cur.unit)}</p><span class="count">${done} من ${st.length} موظفات تم تقييمهن</span>${op?"":'<p class="err">التقييم مغلق حالياً</p>'}
  ${st.length?"":'<p class="err">لا توجد موظفات مباشرات في هذا الموقع</p>'}
  ${st.map((x,i)=>{const e=S.emps[x.id]||{},s=e.s||"new";return `<div class="row"><div><b>${esc(x.n)}</b><br><small>${x.c}${e.d?" · "+e.d:""}</small></div><span class="tag ${s}">${lab[s]}</span>${s=="done"?`<button class="btn sm" data-v="${i}">عرض</button>${ce?`<button class="btn p sm" data-e="${i}">تعديل</button>`:""}`:op?`<button class="btn p sm" data-i="${i}">${s=="draft"?"أكملي":"ابدئي"}</button>`:""}</div>`}).join("")}
- <div class="nav"><button class="btn" id="out">${S.U.length>1?"المواقع":"تغيير المديرة"}</button><span></span></div>`;
+ <div class="nav"><button class="btn" id="out">${S.U.length>1?"المواقع":"تغيير القيادية"}</button><span></span></div>`;
  const pick=async(x,m)=>{S.emp=x.n;S.eid=x.id;S.cat=CATS.indexOf(x.c);S.sc={};S.nt={};S.free="";S.edit=m==1;
   try{if(m==0){const d=S.emps[x.id]||{};if(d.dr){const q=JSON.parse(d.dr);S.sc=q.sc||{};S.nt=q.nt||{};S.free=q.free||""}return go(1)}
    const d=(await db.doc("evaluations/"+S.k+"_"+x.id).get()).data();if(!d)return alert("تعذر العثور على التقييم");
