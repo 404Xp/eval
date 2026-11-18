@@ -49,7 +49,11 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:9px 6px;b
 .mut{color:var(--mut);margin:0 0 12px}h3{margin:0 0 6px;font-size:18px}.card2{border:2px solid var(--line);border-radius:18px;padding:16px 20px;margin:16px 0}.card2 .nav{margin-top:12px;padding-top:0;border:0}
 button.row{width:100%;font:inherit;text-align:start;cursor:pointer;color:var(--navy)}
 .err.top{position:sticky;top:0;z-index:5;background:#fdecea;border-radius:12px;padding:10px 14px;margin:0 0 12px}.err.top:empty{display:none}
-@media(max-width:560px){.row{flex-wrap:wrap}.card{padding:20px}.opts{grid-template-columns:1fr}.bar{width:24px}}
+@media(max-width:560px){.row{flex-wrap:wrap}.opts{grid-template-columns:1fr}.bar{width:24px}
+header{padding:12px 14px;gap:12px}.logo{font-size:17px;padding-inline-end:12px}header h1{font-size:18px}header p{font-size:13px}
+main{margin:14px auto;padding:0 10px}.card{padding:18px 14px;border-radius:20px}h2{font-size:22px;margin-bottom:14px}
+.card2{padding:14px;margin:14px 0}.card2 .nav{display:block;margin-top:14px}.card2 .nav .btn{width:100%}.card2 .nav span{display:none}
+input[type=text],select,textarea{font-size:16px;padding:12px 14px}.chk{align-items:flex-start;line-height:1.6}.chk input{flex:none;margin-top:3px}}
 @media print{header,.steps,.nav,.noprint{display:none}body{background:#fff}.card{box-shadow:none}}
 </style>
 </head>
@@ -89,8 +93,8 @@ function login(){
  const dl=(id,a)=>`<datalist id="${id}">${a.map(x=>`<option value="${esc(x.n)}">`).join("")}</datalist>`;
  $("view").innerHTML=`<h2>الدخول</h2>
  <label class="chk"><input type="checkbox" id="ack"> أدركت خصوصية الرابط وألتزم بذلك (خاص بالقياديات فقط)</label>
- <div class="card2"><h3>القيادات ومشرفات الميدان</h3><label class="f" for="mg">اسم القيادية <b>*</b></label><input type="text" id="mg" list="ml" autocomplete="off" placeholder="اكتبي اسمك واختاريه من القائمة">${dl("ml",S.mgrs)}<div class="nav"><span></span><button class="btn p" id="nx">دخول</button></div></div>
- <div class="card2"><h3>الحلقات</h3><label class="f" for="hl">اسم الحلقة <b>*</b></label><input type="text" id="hl" list="hlist" autocomplete="off" placeholder="اكتبي اسم الحلقة واختاريها من القائمة">${dl("hlist",S.hals)}<div class="nav"><span></span><button class="btn p" id="nh">دخول</button></div></div>
+ <div class="card2"><h3>القيادات ومشرفات الميدان</h3><label class="f" for="mg">اسم القيادية <b>*</b></label><input type="text" id="mg" list="ml" autocomplete="off" placeholder="ابحثي عن اسمك">${dl("ml",S.mgrs)}<div class="nav"><span></span><button class="btn p" id="nx">دخول</button></div></div>
+ <div class="card2"><h3>الحلقات</h3><label class="f" for="hl">اسم الحلقة <b>*</b></label><input type="text" id="hl" list="hlist" autocomplete="off" placeholder="ابحثي عن اسم الحلقة">${dl("hlist",S.hals)}<div class="nav"><span></span><button class="btn p" id="nh">دخول</button></div></div>
  <div class="err" id="err" role="alert"></div>`;
  const enter=async(mode,list,inp)=>{const n=$(inp).value.trim(),it=list.find(x=>x.n==n);
   if(!$("ack").checked)return $("err").textContent="يلزم الإقرار بخصوصية الرابط";
