@@ -49,11 +49,37 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:9px 6px;b
 .mut{color:var(--mut);margin:0 0 12px}h3{margin:0 0 6px;font-size:18px}.card2{border:2px solid var(--line);border-radius:18px;padding:16px 20px;margin:16px 0}.card2 .nav{margin-top:12px;padding-top:0;border:0}
 button.row{width:100%;font:inherit;text-align:start;cursor:pointer;color:var(--navy)}
 .err.top{position:sticky;top:0;z-index:5;background:#fdecea;border-radius:12px;padding:10px 14px;margin:0 0 12px}.err.top:empty{display:none}
-@media(max-width:560px){.row{flex-wrap:wrap}.opts{grid-template-columns:1fr}.bar{width:24px}
-header{padding:12px 14px;gap:12px}.logo{font-size:17px;padding-inline-end:12px}header h1{font-size:18px}header p{font-size:13px}
-main{margin:14px auto;padding:0 10px}.card{padding:18px 14px;border-radius:20px}h2{font-size:22px;margin-bottom:14px}
-.card2{padding:14px;margin:14px 0}.card2 .nav{display:block;margin-top:14px}.card2 .nav .btn{width:100%}.card2 .nav span{display:none}
-input[type=text],select,textarea{font-size:16px;padding:12px 14px}.chk{align-items:flex-start;line-height:1.6}.chk input{flex:none;margin-top:3px}}
+@media(max-width:600px){
+html{-webkit-text-size-adjust:100%}body{font-size:15px;line-height:1.6;background:#fff}
+header{padding:10px 14px;gap:10px;border-bottom-width:3px}.logo{font-size:15px;padding-inline-end:10px;border-inline-end-width:1px}
+header h1{font-size:16px}header p{display:none}
+main{margin:0;padding:0}.card{padding:14px 14px 20px;border-radius:0;box-shadow:none;min-height:calc(100vh - 56px)}
+.steps{gap:6px;margin-bottom:16px}.st{font-size:12px;gap:2px}.st i{width:28px;height:28px;font-size:13px}.bar{width:20px;margin-bottom:16px;height:2px}
+h2{font-size:19px;margin:0 0 6px}h3{font-size:16px}.mut{margin:0 0 10px;font-size:14px}
+label.f{margin:12px 0 4px;font-size:14px}.chk{font-size:14px;align-items:flex-start;margin:12px 0}.chk input{flex:none;margin-top:3px}
+input[type=text],select,textarea{font-size:16px;padding:11px 12px;border-radius:12px}textarea{min-height:64px}
+.btn{padding:0 18px;min-height:46px;font-size:15px;border-radius:12px}.btn.sm{min-height:38px;padding:0 14px;font-size:14px;flex:1}
+.nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding-top:14px}.nav span{display:none}
+.nav .btn.p{order:-1;flex:1 1 100%}.nav .btn:not(.p){flex:1 1 0}
+.card2{padding:12px;margin:12px 0;border-radius:16px}.card2 .nav{margin-top:12px;padding:0}.card2 .nav .btn{flex:1 1 100%}
+.count{padding:2px 12px;font-size:13px;margin-bottom:10px}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px 10px;padding:12px;border-radius:16px;margin-bottom:8px;align-items:center}
+.row>div{min-width:0}.row small{color:var(--mut);font-size:13px}.row .tag{font-size:12px;padding:2px 10px;justify-self:end}
+.row .btn{grid-column:1/-1}.row .btn.sm+.btn.sm{grid-column:auto}
+.row:has(.btn.sm+.btn.sm){grid-template-columns:1fr 1fr}.row:has(.btn.sm+.btn.sm)>div{grid-column:1}.row:has(.btn.sm+.btn.sm)>.tag{grid-column:2}
+.row:has(.btn.sm+.btn.sm)>.btn{grid-column:auto}
+button.row{grid-template-columns:1fr auto}
+details{border-radius:14px;margin-bottom:8px}summary{padding:12px 14px;font-size:15px;gap:8px}summary small{font-size:13px}
+.body{padding:0 14px 14px}.subs li{font-size:13.5px;padding:6px 0;gap:10px}
+.chips{gap:6px;margin-bottom:8px}.chip{min-width:42px;height:42px;font-size:15px}
+.opts{grid-template-columns:1fr}.opt{padding:16px 10px}
+.total{font-size:17px;padding:12px 14px;margin:12px 0;border-radius:14px}
+table,thead,tbody,tr,td,th{display:block}table{font-size:14px}tr:first-child:has(th){display:none}
+tr{border:2px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+td{border:0;padding:2px 0}td:first-child{font-weight:700}
+td[data-l]::before{content:attr(data-l) ": ";color:var(--mut);font-weight:500}
+.err.top{margin:0 -4px 10px}
+}
 @media print{header,.steps,.nav,.noprint{display:none}body{background:#fff}.card{box-shadow:none}}
 </style>
 </head>
@@ -124,7 +150,7 @@ function dash(){
  $("out").onclick=out}
 function viewEval(x,d){const L=JSON.parse(d.items||"[]");$("steps").innerHTML="";
  $("view").innerHTML=`<h2>${esc(x.n)}</h2><p class="mut">${x.c} · ${esc(d.unit)}<br>المقيِّمة: ${esc(d.ev)}</p><div class="total">المجموع: ${d.total} من ${d.max} (${Math.round(d.total/d.max*100)}٪)</div>
- <table><tr><th>البند</th><th>الدرجة</th><th>الملاحظات</th></tr>${L.map(r=>`<tr><td>${esc(r.b)}</td><td>${r.s}/${r.m}</td><td>${esc(r.n)}</td></tr>`).join("")}</table>${d.free?`<p><b>مساحة حرة:</b> ${esc(d.free)}</p>`:""}
+ <table><tr><th>البند</th><th>الدرجة</th><th>الملاحظات</th></tr>${L.map(r=>`<tr><td>${esc(r.b)}</td><td data-l="الدرجة">${r.s}/${r.m}</td><td data-l="الملاحظات">${esc(r.n)}</td></tr>`).join("")}</table>${d.free?`<p><b>مساحة حرة:</b> ${esc(d.free)}</p>`:""}
  <div class="nav noprint"><button class="btn" id="bk">رجوع</button><button class="btn" onclick="print()">طباعة</button></div>`;$("bk").onclick=draw}
 function p2(){
  const L=items();
@@ -146,7 +172,7 @@ function p3(){
  const back=m=>{$("view").innerHTML=`<h2>${m}</h2><div class="nav"><span></span><button class="btn p" id="again">العودة لقائمة الموظفات</button></div>`;$("again").onclick=()=>{Object.assign(S,{emp:"",eid:"",cat:-1,sc:{},nt:{},free:"",edit:false});go(0)}};
  $("view").innerHTML=`<h2>المراجعة</h2><p>الموظفة: <b>${esc(S.emp)}</b> — ${CATS[S.cat]}<br>${esc(S.cur.unit)}<br>المقيِّمة: ${esc(EV())}</p>
  <div class="total">المجموع: ${t} من ${mx} (${Math.round(t/mx*100)}٪)</div>
- <table><tr><th>البند</th><th>الدرجة</th><th>الملاحظات</th></tr>${L.map((c,i)=>`<tr><td>${c[0]}</td><td>${S.sc[i]}/${c[1]}</td><td>${esc(S.nt[i])}</td></tr>`).join("")}</table>
+ <table><tr><th>البند</th><th>الدرجة</th><th>الملاحظات</th></tr>${L.map((c,i)=>`<tr><td>${c[0]}</td><td data-l="الدرجة">${S.sc[i]}/${c[1]}</td><td data-l="الملاحظات">${esc(S.nt[i])}</td></tr>`).join("")}</table>
  ${S.free?`<p><b>مساحة حرة:</b> ${esc(S.free)}</p>`:""}
  <div class="err noprint" id="msg"></div><div class="nav noprint"><button class="btn" id="bk">رجوع</button><button class="btn" onclick="print()">طباعة</button><button class="btn p" id="sd">${S.edit?"حفظ التعديل":"إرسال التقييم"}</button></div>`;
  $("bk").onclick=()=>go(1);
