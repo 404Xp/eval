@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>تقييم الأداء الوظيفي | تحفيظ الشرقية</title>
+<title>تقييم الأداء الوظيفي | إدارة الإشراف النسائي بالدمام</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap">
 <style>
 :root{--navy:#3b4666;--sky:#e2bdb6;--bg:#f9f1f0;--line:#e8dedb;--mut:#6e6b7a;--red:#b83a32}
@@ -21,6 +21,7 @@ main{max-width:760px;margin:32px auto;padding:0 16px}
 .st.done i{background:var(--sky);color:var(--navy)}
 .bar{height:3px;width:60px;background:#ececec;margin-bottom:20px}.bar.done{background:var(--sky)}
 h2{margin:0 0 20px;font-size:24px}
+.wl{margin-bottom:6px}.wl small{display:block;color:var(--mut);font-size:15px;font-weight:500;line-height:1.4}.wl h2{margin:0 0 4px;font-size:28px;line-height:1.35}
 label.f{display:block;font-weight:700;margin:18px 0 6px}label.f b{color:var(--red)}
 input[type=text],select,textarea{width:100%;font:inherit;padding:13px 16px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--navy)}
 input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
@@ -55,7 +56,7 @@ header{padding:10px 14px;gap:10px;border-bottom-width:3px}.logo{height:38px}head
 header h1{font-size:16px}header p{display:none}
 main{margin:0;padding:0}.card{padding:14px 14px 20px;border-radius:0;box-shadow:none;min-height:calc(100vh - 56px)}
 .steps{gap:6px;margin-bottom:16px}.st{font-size:12px;gap:2px}.st i{width:28px;height:28px;font-size:13px}.bar{width:20px;margin-bottom:16px;height:2px}
-h2{font-size:19px;margin:0 0 6px}h3{font-size:16px}.mut{margin:0 0 10px;font-size:14px}
+h2{font-size:19px;margin:0 0 6px}.wl h2{font-size:23px;margin:0 0 2px}.wl small{font-size:14px}h3{font-size:16px}.mut{margin:0 0 10px;font-size:14px}
 label.f{margin:12px 0 4px;font-size:14px}.chk{font-size:14px;align-items:flex-start;margin:12px 0}.chk input{flex:none;margin-top:3px}
 input[type=text],select,textarea{font-size:16px;padding:11px 12px;border-radius:12px}textarea{min-height:64px}
 .btn{padding:0 18px;min-height:46px;font-size:15px;border-radius:12px}.btn.sm{min-height:38px;padding:0 14px;font-size:14px;flex:1}
@@ -134,10 +135,10 @@ function login(){
 function dash(){
  const out=()=>{if(S.cur&&S.U.length>1){S.cur=null}else{Object.assign(S,{U:null,cur:null,m:"",k:"",emps:{},rater:"",evFix:""})}draw()};
  if(!S.cur){
-  $("view").innerHTML=`<h2>${esc(EVB())}</h2><p class="mut">اختاري الموقع</p>${S.U.map((x,i)=>{const t=uq(x.staff),d=t.filter(y=>(S.emps[y.id]||{}).s=="done").length;return `<button type="button" class="row" data-l="${i}"><div><b>${esc(x.unit)}</b><br><small>${esc(x.dom)}</small></div><span class="tag">${d} من ${t.length}</span></button>`}).join("")}<div class="nav"><button class="btn" id="out">تغيير القيادية</button><span></span></div>`;
+  $("view").innerHTML=`<div class="wl"><small>مرحباً بك</small><h2>${esc(EVB())}</h2></div><p class="mut">اختاري الموقع</p>${S.U.map((x,i)=>{const t=uq(x.staff),d=t.filter(y=>(S.emps[y.id]||{}).s=="done").length;return `<button type="button" class="row" data-l="${i}"><div><b>${esc(x.unit)}</b><br><small>${esc(x.dom)}</small></div><span class="tag">${d} من ${t.length}</span></button>`}).join("")}<div class="nav"><button class="btn" id="out">تغيير القيادية</button><span></span></div>`;
   document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{S.cur=S.U[b.dataset.l];draw()});$("out").onclick=out;return}
  const st=uq(S.cur.staff),done=st.filter(x=>(S.emps[x.id]||{}).s=="done").length,lab={done:"تم ✓",draft:"مسودة",new:"لم يبدأ"},op=isOpen(),ce=canEdit();
- $("view").innerHTML=`<h2>${esc(EVB())}</h2><p class="mut">${esc(S.cur.unit)}</p>${S.mode=="H"?`<label class="f" for="rt">اسمك <b>*</b></label><input type="text" id="rt" maxlength="60" autocomplete="name" placeholder="اكتبي اسمك الكامل" value="${esc(S.rater)}"><p class="err" id="err" role="alert"></p>`:""}<span class="count">${done} من ${st.length} موظفات تم تقييمهن</span>${op?"":'<p class="err">التقييم مغلق حالياً</p>'}
+ $("view").innerHTML=`<div class="wl"><small>مرحباً بك</small><h2>${esc(EVB())}</h2></div><p class="mut">${esc(S.cur.unit)}</p>${S.mode=="H"?`<label class="f" for="rt">اسمك <b>*</b></label><input type="text" id="rt" maxlength="60" autocomplete="name" placeholder="اكتبي اسمك الكامل" value="${esc(S.rater)}"><p class="err" id="err" role="alert"></p>`:""}<span class="count">${done} من ${st.length} موظفات تم تقييمهن</span>${op?"":'<p class="err">التقييم مغلق حالياً</p>'}
  ${st.length?"":'<p class="err">لا توجد موظفات مباشرات في هذا الموقع</p>'}
  ${st.map((x,i)=>{const e=S.emps[x.id]||{},s=e.s||"new";return `<div class="row"><div><b>${esc(x.n)}</b><br><small>${x.c}${e.d?" · "+e.d:""}</small></div><span class="tag ${s}">${lab[s]}</span>${s=="done"?`<button class="btn sm" data-v="${i}">عرض</button>${ce?`<button class="btn p sm" data-e="${i}">تعديل</button>`:""}`:op?`<button class="btn p sm" data-i="${i}">${s=="draft"?"أكملي":"ابدئي"}</button>`:""}</div>`}).join("")}
  <div class="nav"><button class="btn" id="out">${S.U.length>1?"المواقع":"تغيير القيادية"}</button><span></span></div>`;
