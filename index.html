@@ -21,6 +21,7 @@ main{max-width:760px;margin:32px auto;padding:0 16px}
 .st.done i{background:var(--sky);color:var(--navy)}
 .bar{height:3px;width:60px;background:#ececec;margin-bottom:20px}.bar.done{background:var(--sky)}
 h2{margin:0 0 20px;font-size:24px}
+.note{background:#fbf3f1;border:2px solid var(--rose);border-inline-start:6px solid var(--navy);border-radius:14px;padding:12px 14px;margin:0 0 14px;display:flex;flex-direction:column;gap:2px}.note b{color:var(--navy)}.note span{color:var(--navy);font-size:15px}
 .wl{margin-bottom:6px}.wl small{display:block;color:var(--mut);font-size:15px;font-weight:500;line-height:1.4}.wl h2{margin:0 0 4px;font-size:28px;line-height:1.35}
 label.f{display:block;font-weight:700;margin:18px 0 6px}label.f b{color:var(--red)}
 input[type=text],select,textarea{width:100%;font:inherit;padding:13px 16px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--navy)}
@@ -106,6 +107,10 @@ const EV=()=>S.edit&&S.evFix?S.evFix:S.mode=="H"&&S.rater.trim()?"مسؤولة �
 const isOpen=()=>S.set.open!==false;
 const canEdit=()=>!!(S.set.editUntil&&S.set.editUntil.toDate&&S.set.editUntil.toDate()>new Date());
 const esc=t=>String(t||"").replace(/</g,"&lt;");
+const DEF_MSG="التعديل على التقييمات متاح حتى {date}. اضغطي «تعديل» بجانب الموظفة لتعديل تقييمها.";
+const fmtD=d=>new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-latn",{weekday:"long",day:"numeric",month:"long",year:"numeric",hour:"numeric",minute:"2-digit",hour12:true}).format(d);
+const editMsg=(set,d)=>String(set.editMsg||DEF_MSG).replace(/\{date\}/g,fmtD(d));
+
 function steps(){const n=["الموظفات","التقييم","المراجعة"];$("steps").innerHTML=n.map((t,i)=>(i?`<div class="bar ${S.step>=i?"done":""}"></div>`:"")+`<div class="st ${S.step==i?"on":""} ${S.step>i?"done":""}"><i>${S.step>i?"✓":i+1}</i>${t}</div>`).join("")}
 function go(n){S.step=n;scrollTo(0,0);draw()}
 function draw(){if(!S.set)return load();if(!S.U)return login();steps();(S.step==0?dash:S.step==1?p2:p3)()}
@@ -138,7 +143,7 @@ function dash(){
   $("view").innerHTML=`<div class="wl"><small>مرحباً بك</small><h2>${esc(EVB())}</h2></div><p class="mut">اختاري الموقع</p>${S.U.map((x,i)=>{const t=uq(x.staff),d=t.filter(y=>(S.emps[y.id]||{}).s=="done").length;return `<button type="button" class="row" data-l="${i}"><div><b>${esc(x.unit)}</b><br><small>${esc(x.dom)}</small></div><span class="tag">${d} من ${t.length}</span></button>`}).join("")}<div class="nav"><button class="btn" id="out">تغيير القيادية</button><span></span></div>`;
   document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{S.cur=S.U[b.dataset.l];draw()});$("out").onclick=out;return}
  const st=uq(S.cur.staff),done=st.filter(x=>(S.emps[x.id]||{}).s=="done").length,lab={done:"تم ✓",draft:"مسودة",new:"لم يبدأ"},op=isOpen(),ce=canEdit();
- $("view").innerHTML=`<div class="wl"><small>مرحباً بك</small><h2>${esc(EVB())}</h2></div><p class="mut">${esc(S.cur.unit)}</p>${S.mode=="H"?`<label class="f" for="rt">اسمك <b>*</b></label><input type="text" id="rt" maxlength="60" autocomplete="name" placeholder="اكتبي اسمك الكامل" value="${esc(S.rater)}"><p class="err" id="err" role="alert"></p>`:""}<span class="count">${done} من ${st.length} موظفات تم تقييمهن</span>${op?"":'<p class="err">التقييم مغلق حالياً</p>'}
+ $("view").innerHTML=`<div class="wl"><small>مرحباً بك</small><h2>${esc(EVB())}</h2></div><p class="mut">${esc(S.cur.unit)}</p>${S.mode=="H"?`<label class="f" for="rt">اسمك <b>*</b></label><input type="text" id="rt" maxlength="60" autocomplete="name" placeholder="اكتبي اسمك الكامل" value="${esc(S.rater)}"><p class="err" id="err" role="alert"></p>`:""}<span class="count">${done} من ${st.length} موظفات تم تقييمهن</span>${ce?`<div class="note" role="status"><b>✎ التعديل متاح</b><span>${esc(editMsg(S.set,S.set.editUntil.toDate()))}</span></div>`:""}${op?"":'<p class="err">التقييم مغلق حالياً</p>'}
  ${st.length?"":'<p class="err">لا توجد موظفات مباشرات في هذا الموقع</p>'}
  ${st.map((x,i)=>{const e=S.emps[x.id]||{},s=e.s||"new";return `<div class="row"><div><b>${esc(x.n)}</b><br><small>${x.c}${e.d?" · "+e.d:""}</small></div><span class="tag ${s}">${lab[s]}</span>${s=="done"?`<button class="btn sm" data-v="${i}">عرض</button>${ce?`<button class="btn p sm" data-e="${i}">تعديل</button>`:""}`:op?`<button class="btn p sm" data-i="${i}">${s=="draft"?"أكملي":"ابدئي"}</button>`:""}</div>`}).join("")}
  <div class="nav"><button class="btn" id="out">${S.U.length>1?"المواقع":"تغيير القيادية"}</button><span></span></div>`;
