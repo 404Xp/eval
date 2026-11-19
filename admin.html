@@ -45,6 +45,7 @@ tbody tr.rw{cursor:pointer}tbody tr.rw:hover{background:#fcf8f7}
 .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
 .chip{background:var(--bg);border:2px solid var(--rose);border-radius:20px;padding:3px 6px 3px 14px;font-size:14px;font-weight:700;display:inline-flex;gap:6px;align-items:center}
 .chip button{border:0;background:var(--navy);color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font:inherit;line-height:1}
+.note{background:#fbf3f1;border:2px solid var(--rose);border-inline-start:6px solid var(--navy);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
 .ov{position:fixed;inset:0;background:#3b466680;display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;overflow:auto;z-index:9}
 .ov .card{max-width:820px;width:100%;margin:0}
 @media(max-width:640px){.card{padding:16px}header{padding:12px 16px}}
@@ -60,6 +61,10 @@ tbody tr.rw{cursor:pointer}tbody tr.rw:hover{background:#fcf8f7}
 firebase.initializeApp({apiKey:"AIzaSyDFFXzLJSwDv_iohknLec8ZiMy6xHkGtNc",authDomain:"staff-eval-3af95.firebaseapp.com",projectId:"staff-eval-3af95",storageBucket:"staff-eval-3af95.firebasestorage.app",messagingSenderId:"511870167807",appId:"1:511870167807:web:7c13e4c0efe5fc93be7aca"});
 const db=firebase.firestore(),auth=firebase.auth(),ADMINS=["ranaaqeelorg@gmail.com","quran.dm@gmail.com"];
 const $=id=>document.getElementById(id);
+const DEF_MSG="التعديل على التقييمات متاح حتى {date}. اضغطي «تعديل» بجانب الموظفة لتعديل تقييمها.";
+const fmtD=d=>new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-latn",{weekday:"long",day:"numeric",month:"long",year:"numeric",hour:"numeric",minute:"2-digit",hour12:true}).format(d);
+const editMsg=(set,d)=>String(set.editMsg||DEF_MSG).replace(/\{date\}/g,fmtD(d));
+
 const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
 const nz=s=>(s||"").replace(/[ً-ٟـ\s]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي");
 const pct=(a,b)=>b?Math.round(a/b*100):0;
@@ -80,7 +85,7 @@ async function load(){$("view").innerHTML='<div class="card">جارٍ تحميل
   const hu=((h.data()||{}).items||[]).flatMap(x=>x.u||[]);if(hu.length)D.leaders.push({n:"مسؤولة الحلقات",k:"H",u:hu});
   D.ev=ev;D.evById={};ev.forEach(e=>D.evById[e.id]=e);
   D.R=[];D.leaders.forEach(L=>{const seen=new Set(),E=D.st[L.k]||{};L.u.forEach(id=>{const u=D.units[id];if(!u)return;(u.staff||[]).forEach(s=>{if(seen.has(s.id))return;seen.add(s.id);
-   const e=E[s.id];D.R.push({L:L.n,dom:u.dom,unit:u.unit,name:s.n,cat:s.c,st:e&&e.s=="done"?"done":e&&e.s=="draft"?"draft":"none",ev:D.evById[L.k+"_"+s.id]})})})});
+   const e=E[s.id];D.R.push({lk:L.k,id:s.id,L:L.n,dom:u.dom,unit:u.unit,name:s.n,cat:s.c,st:e&&e.s=="done"?"done":e&&e.s=="draft"?"draft":"none",ev:D.evById[L.k+"_"+s.id]})})})});
   draw()}
  catch(e){$("view").innerHTML='<div class="card"><p class="err">تعذر تحميل البيانات.</p><button class="btn p" onclick="load()">إعادة المحاولة</button></div>'}}
 function draw(){const T=[["ctl","الإعدادات"],["prg","التقدم"],["srch","البحث في التقييمات"],["stat","الإحصائيات"]];
@@ -116,12 +121,19 @@ function ctl(msg){const s=D.set,eu=s.editUntil&&s.editUntil.toDate?s.editUntil.t
  <h3>مدة التعديل بعد الإرسال</h3><p class="mut">${live?"التعديل مفتوح حتى "+eu.toLocaleString("ar-SA"):"التعديل مغلق حالياً، التقييم المرسل لا يتغير."}</p>
  <div class="row"><label for="c_eu">ينتهي التعديل في:</label><input type="datetime-local" id="c_eu" value="${eu?loc(eu):""}"><button class="btn p" id="c_sv">حفظ التاريخ</button><button class="btn" id="c_cl">إغلاق التعديل الآن</button></div>
  <div class="row"><span class="mut">اختصارات من الآن:</span><button class="btn sm" data-dy="3">٣ أيام</button><button class="btn sm" data-dy="7">أسبوع</button><button class="btn sm" data-dy="14">أسبوعين</button></div>
+ <h3>رسالة التعديل للقيادات</h3><p class="mut">تظهر للقيادات في صفحتهن طالما التعديل مفتوح. اكتبي <b dir="ltr">{date}</b> مكان موعد انتهاء التعديل.</p>
+ <textarea id="c_msg" rows="3" maxlength="300" style="width:100%;font:inherit;padding:10px 12px;border:2px solid var(--line);border-radius:12px;color:var(--navy)">${esc(s.editMsg||DEF_MSG)}</textarea>
+ <p class="mut" style="margin:8px 0 4px">كيف تظهر:</p><div class="note" id="c_pv"></div>
+ <div class="row"><button class="btn p" id="c_ms">حفظ الرسالة</button><button class="btn" id="c_md">استعادة الافتراضية</button></div>
  <p class="msg" id="m">${msg||""}</p></div>`;
  const save=async(o,t)=>{try{await db.doc("settings/main").set(o,{merge:true});Object.assign(D.set,o);ctl(t)}catch(e){$("m").className="msg err";$("m").textContent="تعذر الحفظ"}};
  $("c_open").onchange=e=>save({open:e.target.checked},e.target.checked?"تم فتح التقييم":"تم إغلاق التقييم");
  $("c_link").onchange=e=>save({linkOpen:e.target.checked},e.target.checked?"تم فتح الرابط":"تم إغلاق الرابط");
  $("c_sv").onclick=()=>{const v=$("c_eu").value;if(!v)return;save({editUntil:firebase.firestore.Timestamp.fromDate(new Date(v))},"تم حفظ تاريخ التعديل")};
  document.querySelectorAll("[data-dy]").forEach(b=>b.onclick=()=>save({editUntil:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+b.dataset.dy*864e5))},"تم تحديد مدة التعديل"));
+ const pv=()=>{const t=$("c_msg").value||DEF_MSG;$("c_pv").innerHTML="<b>✎ التعديل متاح</b><span></span>";$("c_pv").lastChild.textContent=t.replace(/\{date\}/g,fmtD(eu||new Date(Date.now()+6048e5)))};pv();$("c_msg").oninput=pv;
+ $("c_ms").onclick=()=>{const v=$("c_msg").value.trim();if(!v)return;save({editMsg:v},"تم حفظ الرسالة")};
+ $("c_md").onclick=()=>{$("c_msg").value=DEF_MSG;pv()};
  $("c_cl").onclick=async()=>{try{await db.doc("settings/main").update({editUntil:firebase.firestore.FieldValue.delete()});delete D.set.editUntil;ctl("تم إغلاق التعديل")}catch(e){$("m").className="msg err";$("m").textContent="تعذر الإغلاق"}}}
 
 /* ===== التقدم التفاعلي ===== */
@@ -140,11 +152,12 @@ function prg(){const opt=(a,v)=>`<option value="">الكل</option>`+[...new Set
   <label>المجال <select id="f_dom">${opt(D.R.map(r=>r.dom),F.dom)}</select></label>
   <label>الفئة <select id="f_cat">${opt(D.R.map(r=>r.cat),F.cat)}</select></label>
   <label>الحالة <select id="f_st"><option value="">الكل</option>${[["done","تم"],["draft","مسودة"],["none","لم يبدأ"],["late","غير مكتمل (المتأخرات)"]].map(x=>`<option value="${x[0]}" ${F.st==x[0]?"selected":""}>${x[1]}</option>`).join("")}</select></label></div>
- <div id="chips"></div><div class="row"><label>تجميع حسب:</label><span id="gb"></span><span style="flex:1"></span><button class="btn sm" id="cp">نسخ المتأخرات</button><button class="btn sm" id="csv">تصدير CSV</button></div>
+ <div id="chips"></div><div class="row"><label>تجميع حسب:</label><span id="gb"></span><span style="flex:1"></span><button class="btn sm" id="cp">نسخ المتأخرات</button><button class="btn sm" id="orph">حالات بدون تقييم</button><button class="btn sm" id="csv">تصدير CSV</button></div>
  <div class="cards" id="kp"></div><p class="mut">اضغطي على أي اسم أو رقم في الجدول لتفصيله. الموظفة عند قياديتين تُحسب مرتين (تقييم لكل قيادية).</p><div id="tb"></div></div>`;
  $("f_q").oninput=e=>{F.q=e.target.value;upd(1)};
  ["dom","cat","st"].forEach(k=>$("f_"+k).onchange=e=>{F[k]=e.target.value;upd()});
  $("cp").onclick=()=>{const t=agg(filt(),"L").filter(o=>o.d<o.t).map(o=>o.n+" ("+o.d+"/"+o.t+")").join("\n");try{navigator.clipboard.writeText(t);$("cp").textContent="تم النسخ"}catch(e){}};
+ $("orph").onclick=orphans;
  $("csv").onclick=()=>{const h=$("tb");if(!h._R)return;const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"',cs=h._C.filter(c=>!c.nocsv);
   const t=[cs.map(c=>q(c.l)).join(",")].concat(h._R.map(r=>cs.map(c=>q(c.get(r))).join(","))).join("\r\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+t],{type:"text/csv;charset=utf-8"}));a.download="progress.csv";a.click()};
@@ -168,13 +181,27 @@ function upd(keep){const rows=filt(),T={t:rows.length,d:0,r:0,x:0};rows.forEach(
    {k:"d",l:"المجال",t:"s",get:r=>r.dom,click:f("dom","dom")},
    {k:"l",l:"القيادية",t:"s",get:r=>r.L,click:f("L","L")},
    {k:"s",l:"الحالة",t:"s",get:r=>ST[r.st],h:r=>`<em class="bd ${r.st}">${ST[r.st]}</em>`,click:r=>{F.st=r.st;upd()}},
-   {k:"p",l:"الدرجة",t:"n",get:r=>r.ev?pct(r.ev.total,r.ev.max):-1,h:r=>r.ev?`${r.ev.total}/${r.ev.max} (${pct(r.ev.total,r.ev.max)}٪)`:"—"}
+   {k:"p",l:"الدرجة",t:"n",get:r=>r.ev?pct(r.ev.total,r.ev.max):-1,h:r=>r.ev?`${r.ev.total}/${r.ev.max} (${pct(r.ev.total,r.ev.max)}٪)`:"—"},
+   {k:"a",l:"إجراء",t:"s",nocsv:1,get:r=>r.st=="done"?"إعادة تعيين":"",h:r=>r.st=="done"?"إعادة تعيين":"",click:r=>{if(r.st=="done")resetDlg(r)}}
   ],rows,{sk:"n"});
  }else{const g=GD[GB],cols=[{k:"n",l:g.l,t:"s",get:r=>r.n,click:r=>go(GB,r.n)}];
   if(GB=="L")cols.push({k:"u",l:"المواقع",t:"s",get:r=>r.u});
   const cn=(k,l,st)=>({k:k,l:l,t:"n",get:r=>r[k],click:r=>go(GB,r.n,st)});
   cols.push(cn("t","المطلوب",""),cn("d","تم","done"),cn("r","مسودة","draft"),cn("x","لم يبدأ","none"),{k:"p",l:"الإنجاز",t:"n",get:r=>pct(r.d,r.t),h:bar});
   renderTbl(host,"g_"+GB,cols,agg(rows,GB),{sk:"p"})}}
+function resetDlg(r){const o=document.createElement("div");o.className="ov";const c=()=>o.remove();
+ o.innerHTML=`<div class="card"><h2>إعادة تعيين التقييم</h2><p><b>${esc(r.name)}</b><br>${esc(r.unit)} · ${esc(r.L)}</p><p class="err">سيُحذف التقييم المحفوظ (الدرجات والملاحظات) نهائياً، وتعود الموظفة "لم يبدأ" عند القيادية لتقييمها من جديد. إن كان التقييم منسوخاً للشيت فاحذفي صفه يدوياً من تبويب «التقييمات».</p><div class="row"><button class="btn p" id="rs">نعم، أعيدي التعيين</button><button class="btn" id="cx">إلغاء</button><span class="msg" id="rm"></span></div></div>`;
+ document.body.appendChild(o);o.onclick=e=>{if(e.target==o)c()};o.querySelector("#cx").onclick=c;
+ o.querySelector("#rs").onclick=async()=>{const b=o.querySelector("#rs");b.disabled=true;$("rm").textContent="جارٍ التنفيذ...";
+  try{await db.doc("evaluations/"+r.lk+"_"+r.id).delete();await db.doc("mgrState/"+r.lk).update({["emps."+r.id]:firebase.firestore.FieldValue.delete()});c();load()}
+  catch(e){b.disabled=false;$("rm").className="msg err";$("rm").textContent="تعذر التنفيذ"}}}
+function orphans(){const O=D.R.filter(r=>r.st=="done"&&!r.ev);
+ const o=document.createElement("div");o.className="ov";const c=()=>o.remove();
+ o.innerHTML=`<div class="card"><p><a class="lnk" id="cx">إغلاق ✕</a></p><h2>حالات "تم" بدون تقييم محفوظ</h2>${O.length?`<p class="mut">هذه الموظفات تظهر "تم" عند القيادية لكن تقييمهن غير موجود (محذوف مثلاً). إعادة التعيين تحوّلهن إلى "لم يبدأ" لتقييمهن من جديد.</p><div class="tw"><table><tr><th>الموظفة</th><th>الموقع</th><th>القيادية</th></tr>${O.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.unit)}</td><td>${esc(r.L)}</td></tr>`).join("")}</table></div><div class="row"><button class="btn p" id="rs">إعادة تعيين ${O.length} حالة</button><span class="msg" id="rm"></span></div>`:'<p>لا توجد حالات يتيمة، كل الحالات "تم" لها تقييم محفوظ.</p>'}</div>`;
+ document.body.appendChild(o);o.onclick=e=>{if(e.target==o)c()};o.querySelector("#cx").onclick=c;
+ const b=o.querySelector("#rs");if(b)b.onclick=async()=>{b.disabled=true;$("rm").textContent="جارٍ التنفيذ...";
+  const by={};O.forEach(r=>{(by[r.lk]=by[r.lk]||{})["emps."+r.id]=firebase.firestore.FieldValue.delete()});
+  try{await Promise.all(Object.keys(by).map(k=>db.doc("mgrState/"+k).update(by[k])));c();load()}catch(e){b.disabled=false;$("rm").className="msg err";$("rm").textContent="تعذر التنفيذ"}}}
 function detail(r){const e=r.ev;let L=[];try{L=JSON.parse((e&&e.items)||"[]")}catch(x){}
  const o=document.createElement("div");o.className="ov";
  o.innerHTML=`<div class="card"><p><a class="lnk" id="cx">إغلاق ✕</a></p><h2>${esc(r.name)}</h2><p>${esc(r.cat)} · ${esc(r.unit)} · ${esc(r.dom)}<br>القيادية: ${esc(r.L)}<br>الحالة: <em class="bd ${r.st}">${ST[r.st]}</em></p>
