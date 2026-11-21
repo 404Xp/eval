@@ -59,7 +59,7 @@ tbody tr.rw{cursor:pointer}tbody tr.rw:hover{background:#fcf8f7}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
 firebase.initializeApp({apiKey:"AIzaSyDFFXzLJSwDv_iohknLec8ZiMy6xHkGtNc",authDomain:"staff-eval-3af95.firebaseapp.com",projectId:"staff-eval-3af95",storageBucket:"staff-eval-3af95.firebasestorage.app",messagingSenderId:"511870167807",appId:"1:511870167807:web:7c13e4c0efe5fc93be7aca"});
-const db=firebase.firestore(),auth=firebase.auth(),ADMINS=["ranaaqeelorg@gmail.com","quran.dm@gmail.com",'yaman1429@gmail.com'];
+const db=firebase.firestore(),auth=firebase.auth(),ADMINS=["ranaaqeelorg@gmail.com","quran.dm@gmail.com",'yaman1429@gmail.com' , 'h.almalkey3@gmail.com', 'bayan.alhumaidan@gmail.com' ];
 const $=id=>document.getElementById(id);
 const DEF_MSG="التعديل على التقييمات متاح حتى {date}. اضغطي «تعديل» بجانب الموظفة لتعديل تقييمها.";
 const fmtD=d=>new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-latn",{weekday:"long",day:"numeric",month:"long",year:"numeric",hour:"numeric",minute:"2-digit",hour12:true}).format(d);
